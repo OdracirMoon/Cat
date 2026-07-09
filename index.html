@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Tarot de los Gatos 🐈‍⬛</title>
+  <meta name="description" content="Herramienta interactiva de lectura del Tarot de los Gatos. Explora los 78 arcanos con significados detallados en un diseño gótico y misterioso." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Stars background -->
+  <div class="stars" id="stars"></div>
+  <div class="mist"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-content">
+      <div class="paw-icon">🐾</div>
+      <h1 class="site-title">El Tarot de los Gatos</h1>
+      <p class="site-subtitle">✦ Guía de los Arcanos Felinos ✦</p>
+    </div>
+  </header>
+
+  <!-- Filter / Search Bar -->
+  <nav class="filter-bar" aria-label="Filtros de cartas">
+    <div class="filter-inner">
+      <input type="text" id="searchInput" placeholder="🔍 Buscar carta..." aria-label="Buscar carta" />
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="all" id="btn-all">Todas (78)</button>
+        <button class="filter-btn" data-filter="mayor" id="btn-mayor">Arcanos Mayores</button>
+        <button class="filter-btn" data-filter="bastos" id="btn-bastos">🔥 Bastos</button>
+        <button class="filter-btn" data-filter="oros" id="btn-oros">🌿 Oros</button>
+        <button class="filter-btn" data-filter="espadas" id="btn-espadas">⚔️ Espadas</button>
+        <button class="filter-btn" data-filter="copas" id="btn-copas">🌊 Copas</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Cards Grid -->
+  <main class="cards-grid" id="cardsGrid" aria-label="Galería de cartas del tarot">
+    <!-- Cards inserted by JS -->
+  </main>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalCardName">
+    <div class="modal-card">
+      <button class="modal-close" id="modalClose" aria-label="Cerrar">&times;</button>
+      <div class="modal-header">
+        <div class="modal-cat-icon" id="modalCatIcon">🐱</div>
+        <div class="modal-arcano-badge" id="modalArcanoBadge"></div>
+        <h2 class="modal-card-name" id="modalCardName"></h2>
+        <div class="modal-keywords" id="modalKeywords"></div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section" id="modalDescSection">
+          <h3 class="modal-section-title">✦ Descripción</h3>
+          <p id="modalDesc"></p>
+        </div>
+        <div class="modal-divider">🐾 ✦ 🐾</div>
+        <div class="modal-section modal-inv-section" id="modalInvSection">
+          <h3 class="modal-section-title inverted-title">🌙 Significado Invertida</h3>
+          <p id="modalInv" class="inverted-text"></p>
+        </div>
+        <div class="modal-divider">🐾 ✦ 🐾</div>
+        <div class="modal-meta" id="modalMeta"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>🐈‍⬛ El Tarot de los Gatos · Texto: Catherine Davidson · Ilustraciones: Thiago Correa 🐈‍⬛</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
