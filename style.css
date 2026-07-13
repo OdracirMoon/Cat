@@ -529,3 +529,562 @@ body {
 ::-webkit-scrollbar-track { background: var(--bg-deep); }
 ::-webkit-scrollbar-thumb { background: var(--text-dim); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
+
+/* ── Navigation Tabs ─────────────────────────────────── */
+.app-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-dim);
+  background: rgba(10, 5, 15, 0.5);
+  position: relative;
+  z-index: 15;
+}
+.nav-tab {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  padding: 0.6rem 1.5rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  text-transform: uppercase;
+}
+.nav-tab:hover {
+  color: var(--accent-violet);
+  background: rgba(155, 95, 199, 0.1);
+  border-color: rgba(155, 95, 199, 0.2);
+}
+.nav-tab.active {
+  color: var(--accent-gold);
+  background: rgba(20, 10, 35, 0.8);
+  border-color: var(--border-gold);
+  box-shadow: 0 0 15px rgba(212, 168, 71, 0.15);
+}
+
+/* ── View Sections ───────────────────────────────────── */
+.view-section {
+  display: none;
+  animation: fadeIn 0.4s ease forwards;
+}
+.view-section.active {
+  display: block;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Reading Container ───────────────────────────────── */
+.reading-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+.reading-controls {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.reading-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-violet));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+.reading-subtitle {
+  font-family: 'Crimson Text', serif;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+.reading-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.reading-btn {
+  background: rgba(20, 12, 30, 0.8);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md);
+  padding: 0.8rem 1.5rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-align: left;
+  min-width: 250px;
+}
+.reading-btn:hover {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 15px rgba(155, 95, 199, 0.3);
+  transform: translateY(-2px);
+  background: rgba(30, 18, 45, 0.9);
+}
+.reading-btn.active {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 15px rgba(212, 168, 71, 0.4);
+  background: rgba(45, 30, 15, 0.6);
+}
+.reading-btn .btn-icon {
+  font-size: 1.8rem;
+}
+.reading-btn .btn-text {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+}
+.reading-btn .btn-text small {
+  font-family: 'Crimson Text', serif;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── Reading Board ───────────────────────────────────── */
+.reading-board {
+  min-height: 480px;
+  background: rgba(10, 5, 15, 0.4);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.6);
+}
+.reading-board-placeholder {
+  text-align: center;
+  max-width: 400px;
+  color: var(--text-secondary);
+}
+.reading-board-placeholder .mystic-symbol {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 0 20px rgba(155, 95, 199, 0.8));
+  animation: float 4s ease-in-out infinite alternate;
+}
+@keyframes float {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-10px); }
+}
+.reading-board-placeholder p {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+.reading-board-placeholder .sub-placeholder {
+  font-family: 'Crimson Text', serif;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+/* ── Card Grid/Row layouts for Readings ───────────────── */
+.spread-row-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  width: 100%;
+}
+
+/* ── Special Paw Layout ──────────────────────────────── */
+.paw-layout {
+  position: relative;
+  width: 100%;
+  max-width: 650px;
+  height: 520px;
+  margin: 0 auto;
+}
+.paw-background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+/* Paw pad shapes */
+.paw-pad {
+  position: absolute;
+  background: rgba(212, 168, 71, 0.03);
+  border: 1px solid rgba(212, 168, 71, 0.07);
+  border-radius: 50% 50% 45% 45%;
+  filter: blur(4px) drop-shadow(0 0 8px rgba(212, 168, 71, 0.05));
+  transition: all 0.5s ease;
+}
+.paw-pad.main-pad {
+  width: 200px;
+  height: 160px;
+  left: 50%;
+  bottom: 50px;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 40% 40% / 40% 40% 60% 60%;
+  background: rgba(155, 95, 199, 0.02);
+  border: 1px solid rgba(155, 95, 199, 0.06);
+}
+.paw-pad.toe-pad {
+  width: 90px;
+  height: 120px;
+}
+.paw-pad.toe-1 { left: 8%; top: 43%; transform: rotate(-25deg); }
+.paw-pad.toe-2 { left: 29%; top: 20%; transform: rotate(-10deg); }
+.paw-pad.toe-3 { right: 29%; top: 20%; transform: rotate(10deg); }
+.paw-pad.toe-4 { right: 8%; top: 43%; transform: rotate(25deg); }
+
+/* Card placement inside Paw Layout */
+.paw-layout .reading-card-wrapper {
+  position: absolute;
+  z-index: 2;
+}
+.paw-layout .pos-1 { left: 50%; bottom: 60px; transform: translateX(-50%); }
+.paw-layout .pos-2 { left: 5%; top: 40%; transform: rotate(-25deg); }
+.paw-layout .pos-3 { left: 26%; top: 15%; transform: rotate(-10deg); }
+.paw-layout .pos-4 { right: 26%; top: 15%; transform: rotate(10deg); }
+.paw-layout .pos-5 { right: 5%; top: 40%; transform: rotate(25deg); }
+
+/* Label badge above/below cards in reading board */
+.slot-label {
+  position: absolute;
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--accent-gold);
+  background: rgba(10, 5, 15, 0.95);
+  border: 1px solid var(--border-gold);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  opacity: 0.85;
+}
+/* Adjust position of label depending on layout */
+.pos-1 .slot-label { bottom: -22px; left: 50%; transform: translateX(-50%); }
+.pos-2 .slot-label { top: -22px; left: 50%; transform: translateX(-50%); }
+.pos-3 .slot-label { top: -22px; left: 50%; transform: translateX(-50%); }
+.pos-4 .slot-label { top: -22px; left: 50%; transform: translateX(-50%); }
+.pos-5 .slot-label { top: -22px; left: 50%; transform: translateX(-50%); }
+.spread-row-layout .slot-label { bottom: -22px; left: 50%; transform: translateX(-50%); }
+
+/* ── 3D Card Flip CSS ────────────────────────────────── */
+.reading-card-wrapper {
+  width: 135px;
+  height: 235px;
+  perspective: 1000px;
+}
+.reading-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow var(--transition);
+  transform-style: preserve-3d;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+.reading-card-wrapper:hover .reading-card-inner {
+  box-shadow: var(--glow-purple);
+}
+.reading-card-wrapper.flipped .reading-card-inner {
+  transform: rotateY(180deg);
+}
+/* Handling inverted orientation: flips Y then rotates 180 degrees */
+.reading-card-wrapper.flipped.is-inverted .reading-card-inner {
+  transform: rotateY(180deg) rotateZ(180deg);
+}
+
+.reading-card-front, .reading-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-dim);
+  overflow: hidden;
+}
+
+/* Card Front: displays actual card contents */
+.reading-card-front {
+  transform: rotateY(180deg); /* face up is back of 3d plane */
+}
+.reading-card-front .tarot-card {
+  width: 100%;
+  height: 100%;
+  border: none;
+  animation: none;
+}
+.reading-card-front .card-inner {
+  min-height: 100%;
+  height: 100%;
+}
+
+/* Card Back: Gothic reverso design */
+.reading-card-back {
+  background: linear-gradient(145deg, #0f0717 0%, #08030c 50%, #150920 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+/* Back details */
+.reading-card-back::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(212, 168, 71, 0.15);
+  border-radius: 8px;
+  pointer-events: none;
+}
+.card-back-ornament {
+  width: 80%;
+  height: 85%;
+  border: 1px solid rgba(155, 95, 199, 0.12);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  color: rgba(212, 168, 71, 0.35);
+  position: relative;
+}
+.card-back-ornament::before, .card-back-ornament::after {
+  content: '✦';
+  font-size: 0.6rem;
+  position: absolute;
+}
+.card-back-ornament::before { top: 4px; }
+.card-back-ornament::after { bottom: 4px; }
+
+.back-symbol {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 8px rgba(212, 168, 71, 0.2));
+  animation: backPulse 4s ease-in-out infinite alternate;
+}
+@keyframes backPulse {
+  from { opacity: 0.4; transform: scale(0.95); }
+  to   { opacity: 0.85; transform: scale(1.05); }
+}
+.back-stars {
+  font-size: 0.5rem;
+  letter-spacing: 0.4rem;
+  color: var(--accent-purple);
+  opacity: 0.4;
+}
+
+/* ── Shuffling Animation states ──────────────────────── */
+.reading-card-wrapper.shuffling {
+  animation: shuffleAnimation 1.2s ease-in-out infinite alternate;
+}
+.reading-card-wrapper.shuffling:nth-child(even) {
+  animation-delay: 0.2s;
+  animation-duration: 1.4s;
+}
+.reading-card-wrapper.shuffling:nth-child(3n) {
+  animation-delay: 0.4s;
+  animation-duration: 1s;
+}
+
+@keyframes shuffleAnimation {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-40px) translateX(25px) rotate(8deg); z-index: 10; }
+  100% { transform: translateY(0) rotate(-4deg); }
+}
+
+/* Shuffling stack layout (all stacked in middle during animation) */
+.reading-board.shuffling-active .spread-row-layout,
+.reading-board.shuffling-active .paw-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+.reading-board.shuffling-active .reading-card-wrapper {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+/* ── Reading Interpretation ──────────────────────────── */
+.reading-interpretation {
+  margin-top: 3rem;
+  animation: fadeIn 0.6s ease forwards;
+}
+.interpretation-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.interpretation-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.6rem;
+  color: var(--accent-gold);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+.interpretation-divider {
+  color: var(--text-dim);
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.interpretation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.interpretation-item {
+  background: linear-gradient(160deg, rgba(20, 10, 35, 0.8) 0%, rgba(10, 5, 20, 0.95) 100%);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: border-color var(--transition);
+}
+.interpretation-item:hover {
+  border-color: var(--border-gold);
+}
+.interpretation-card-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+.interpretation-card-preview .tarot-card {
+  width: 120px;
+  cursor: default;
+}
+.interpretation-card-preview .tarot-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+.interpretation-pos-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  color: var(--accent-gold);
+  border: 1px solid var(--border-gold);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  background: rgba(212, 168, 71, 0.05);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.interpretation-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.8rem;
+}
+.interpretation-card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+.interpretation-card-name.is-inverted-text {
+  color: var(--text-inv);
+}
+.interpretation-card-name.is-inverted-text span {
+  font-size: 0.85rem;
+  font-family: 'Crimson Text', serif;
+  font-weight: normal;
+  font-style: italic;
+  margin-left: 0.6rem;
+}
+.interpretation-desc {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+.interpretation-desc.is-inverted-meaning {
+  border-left: 2px solid var(--text-inv);
+  padding-left: 1rem;
+}
+.interpretation-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+/* ── Mobile responsive adjustments for readings ──────── */
+@media (max-width: 680px) {
+  /* Scale down the paw layout to fit mobile screens */
+  .paw-layout {
+    transform: scale(0.8);
+    transform-origin: center top;
+    margin-bottom: -100px; /* pull up content below since scaled container leaves whitespace */
+  }
+  .interpretation-item {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  .interpretation-card-preview {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    border-bottom: 1px solid var(--border-dim);
+    padding-bottom: 1rem;
+  }
+  .interpretation-card-preview .tarot-card {
+    width: 80px;
+  }
+  .interpretation-card-preview .tarot-card .card-inner {
+    min-height: 120px;
+    padding: 0.6rem 0.4rem;
+  }
+  .interpretation-card-preview .tarot-card .card-symbol {
+    font-size: 1.6rem;
+  }
+  .interpretation-card-preview .tarot-card .card-name {
+    font-size: 0.55rem;
+  }
+  .interpretation-card-preview .tarot-card .card-number,
+  .interpretation-card-preview .tarot-card .card-suit-badge {
+    font-size: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .paw-layout {
+    transform: scale(0.6);
+    margin-bottom: -200px;
+  }
+  .reading-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .reading-btn {
+    min-width: unset;
+  }
+}
