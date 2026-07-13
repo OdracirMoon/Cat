@@ -1051,10 +1051,93 @@ const modal      = $('modalOverlay');
 const modalClose = $('modalClose');
 const searchInput= $('searchInput');
 
+// ─── Audio Synthesizer (Web Audio API) ──────────────
+
+class TarotSoundSynth {
+  constructor() {
+    this.ctx = null;
+  }
+
+  init() {
+    if (this.ctx) return;
+    try {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      console.warn('Web Audio API not supported in this browser');
+    }
+  }
+
+  playChime() {
+    this.init();
+    if (!this.ctx) return;
+    
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+
+    const t = this.ctx.currentTime;
+    
+    // Synthesize a major/pentatonic celestial chime
+    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99]; // C chord notes
+    notes.forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t + idx * 0.05);
+      
+      gain.gain.setValueAtTime(0.08, t + idx * 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + idx * 0.05 + 1.5);
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.start(t + idx * 0.05);
+      osc.stop(t + idx * 0.05 + 1.5);
+    });
+  }
+
+  playShuffle(durationMs = 1200) {
+    this.init();
+    if (!this.ctx) return;
+
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+
+    const interval = 120;
+    const tStart = this.ctx.currentTime;
+    const ticksCount = Math.floor(durationMs / interval);
+
+    for (let i = 0; i < ticksCount; i++) {
+      const t = tStart + (i * interval) / 1000;
+      
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(80, t);
+      osc.frequency.exponentialRampToValueAtTime(30, t + 0.08);
+      
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.start(t);
+      osc.stop(t + 0.1);
+    }
+  }
+}
+
+const synth = new TarotSoundSynth();
+
 // ─── Stars generator ────────────────────────────────
 
 function generateStars() {
   const container = $('stars');
+  if (!container) return;
   const N = 120;
   for (let i = 0; i < N; i++) {
     const s = document.createElement('div');
@@ -1084,20 +1167,30 @@ function buildCard(card, index) {
   article.dataset.suit = card.suit;
   article.style.setProperty('--card-delay', `${(index * 0.03).toFixed(2)}s`);
 
+  const topText = card.arcano === 'Mayor' ? card.number : card.suit.toUpperCase();
+  const bottomText = card.arcano === 'Mayor' ? 'ARCANO MAYOR' : card.number;
+
   article.innerHTML = `
     <div class="card-inner" style="background:${cfg.gradient}">
       <div class="card-accent-line top" style="background:${cfg.lineColor}"></div>
-      <span class="card-number">${card.arcano === 'Mayor' ? card.number : card.suit.toUpperCase()}</span>
-      <span class="card-symbol">${cfg.catIcon}</span>
+      <span class="card-number">${topText}</span>
+      <span class="card-symbol">${card.symbol}</span>
       <span class="card-name">${card.name}</span>
-      <span class="card-suit-badge">${card.number}</span>
+      <span class="card-suit-badge">${bottomText}</span>
       <div class="card-accent-line bot" style="background:${cfg.lineColor}"></div>
     </div>
   `;
 
-  article.addEventListener('click', () => openModal(card));
+  article.addEventListener('click', () => {
+    synth.init();
+    openModal(card);
+  });
   article.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(card); }
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      synth.init();
+      openModal(card);
+    }
   });
 
   return article;
@@ -1162,13 +1255,12 @@ searchInput.addEventListener('input', () => {
 function openModal(card) {
   const cfg = SUIT_CONFIG[card.suit] || SUIT_CONFIG.mayor;
 
-  $('modalArcanoBadge').textContent = `${cfg.label} · ${card.arcano === 'Mayor' ? card.number : card.number}`;
+  $('modalArcanoBadge').textContent = `${cfg.catIcon} ${cfg.label} · ${card.number}`;
   $('modalCardName').textContent = card.name;
   $('modalDesc').textContent = card.description;
   $('modalInv').textContent = card.invertida;
-  $('modalCatIcon').textContent = cfg.catIcon;
+  $('modalCatIcon').textContent = card.symbol;
 
-  // Keywords pills
   const kw = $('modalKeywords');
   kw.innerHTML = '';
   card.keywords.forEach(k => {
@@ -1178,7 +1270,6 @@ function openModal(card) {
     kw.appendChild(pill);
   });
 
-  // Meta chips
   const meta = $('modalMeta');
   meta.innerHTML = [
     { label: 'Arcano', value: card.arcano },
@@ -1191,7 +1282,6 @@ function openModal(card) {
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  // Focus management
   modalClose.focus();
 }
 
@@ -1203,6 +1293,260 @@ function closeModal() {
 modalClose.addEventListener('click', closeModal);
 modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+
+// ─── Tab Navigation Logic ────────────────────────────
+
+const tabCatalog = $('tabCatalog');
+const tabReading = $('tabReading');
+const catalogView = $('catalogView');
+const readingView = $('readingView');
+
+function switchTab(target) {
+  synth.init();
+  if (target === 'catalog') {
+    tabCatalog.classList.add('active');
+    tabReading.classList.remove('active');
+    catalogView.classList.add('active');
+    readingView.classList.remove('active');
+  } else {
+    tabCatalog.classList.remove('active');
+    tabReading.classList.add('active');
+    catalogView.classList.remove('active');
+    readingView.classList.add('active');
+  }
+}
+
+tabCatalog.addEventListener('click', () => switchTab('catalog'));
+tabReading.addEventListener('click', () => switchTab('reading'));
+
+// ─── Tarot Reading Logic ─────────────────────────────
+
+const readingBoard = $('readingBoard');
+const readingInterpretation = $('readingInterpretation');
+
+const SPREADS = {
+  1: {
+    name: 'Tirada Rápida',
+    cardsCount: 1,
+    labels: ['Consejo del día']
+  },
+  3: {
+    name: 'Tirada del Destino',
+    cardsCount: 3,
+    labels: ['Pasado', 'Presente', 'Futuro']
+  },
+  5: {
+    name: 'La Pata del Gato',
+    cardsCount: 5,
+    labels: [
+      'Carta 1 (Base): Dónde se encuentra ahora',
+      'Carta 2 (Dedo Izquierdo): Hacia dónde se dirige',
+      'Carta 3 (Dedo Medio Izquierdo): Fuerzas exteriores',
+      'Carta 4 (Dedo Medio Derecho): Fuerzas interiores',
+      'Carta 5 (Dedo Derecho): Consejo o resultado'
+    ]
+  }
+};
+
+let activeReading = {
+  spreadId: null,
+  cards: [],
+  flippedCount: 0
+};
+
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function initReading(spreadId) {
+  synth.init();
+  activeReading.spreadId = spreadId;
+  activeReading.cards = [];
+  activeReading.flippedCount = 0;
+
+  document.querySelectorAll('.reading-btn').forEach(btn => {
+    if (parseInt(btn.dataset.spread) === spreadId) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  readingInterpretation.style.display = 'none';
+  readingInterpretation.innerHTML = '';
+
+  readingBoard.className = 'reading-board shuffling-active';
+  synth.playShuffle(1200);
+
+  readingBoard.innerHTML = `
+    <div class="spread-row-layout">
+      <div class="reading-card-wrapper shuffling"><div class="reading-card-inner"><div class="reading-card-back"><div class="card-back-ornament"><span class="back-symbol">🐾</span></div></div></div></div>
+      <div class="reading-card-wrapper shuffling"><div class="reading-card-inner"><div class="reading-card-back"><div class="card-back-ornament"><span class="back-symbol">🐾</span></div></div></div></div>
+      <div class="reading-card-wrapper shuffling"><div class="reading-card-inner"><div class="reading-card-back"><div class="card-back-ornament"><span class="back-symbol">🐾</span></div></div></div></div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    drawCardsForSpread(spreadId);
+  }, 1200);
+}
+
+function drawCardsForSpread(spreadId) {
+  const config = SPREADS[spreadId];
+  const shuffledDeck = shuffleArray(TAROT_CARDS);
+  
+  for (let i = 0; i < config.cardsCount; i++) {
+    activeReading.cards.push({
+      card: shuffledDeck[i],
+      inverted: Math.random() < 0.5,
+      flipped: false
+    });
+  }
+
+  readingBoard.className = 'reading-board';
+  readingBoard.innerHTML = '';
+
+  let layoutContainer;
+  if (spreadId === 5) {
+    layoutContainer = document.createElement('div');
+    layoutContainer.className = 'paw-layout';
+    
+    layoutContainer.innerHTML = `
+      <div class="paw-background">
+        <div class="paw-pad main-pad"></div>
+        <div class="paw-pad toe-pad toe-1"></div>
+        <div class="paw-pad toe-pad toe-2"></div>
+        <div class="paw-pad toe-pad toe-3"></div>
+        <div class="paw-pad toe-pad toe-4"></div>
+      </div>
+    `;
+  } else {
+    layoutContainer = document.createElement('div');
+    layoutContainer.className = 'spread-row-layout';
+  }
+
+  activeReading.cards.forEach((item, index) => {
+    const cardWrapper = document.createElement('div');
+    cardWrapper.className = `reading-card-wrapper ${spreadId === 5 ? `pos-${index + 1}` : ''}`;
+    
+    const cardInner = document.createElement('div');
+    cardInner.className = 'reading-card-inner';
+    
+    const cardBack = document.createElement('div');
+    cardBack.className = 'reading-card-back';
+    cardBack.innerHTML = `
+      <div class="card-back-ornament">
+        <span class="back-symbol">🐾</span>
+        <span class="back-stars">✦ ✦ ✦</span>
+      </div>
+    `;
+    
+    const cardFront = document.createElement('div');
+    cardFront.className = 'reading-card-front';
+    const faceEl = buildCard(item.card, index);
+    cardFront.appendChild(faceEl);
+
+    cardInner.appendChild(cardBack);
+    cardInner.appendChild(cardFront);
+    cardWrapper.appendChild(cardInner);
+
+    const label = document.createElement('span');
+    label.className = 'slot-label';
+    label.textContent = config.labels[index].split(': ')[0];
+    cardWrapper.appendChild(label);
+
+    cardInner.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (item.flipped) return;
+
+      item.flipped = true;
+      synth.playChime();
+      
+      cardWrapper.classList.add('flipped');
+      if (item.inverted) {
+        cardWrapper.classList.add('is-inverted');
+      }
+
+      activeReading.flippedCount++;
+      
+      if (activeReading.flippedCount === config.cardsCount) {
+        setTimeout(showReadingInterpretation, 1500);
+      }
+    });
+
+    layoutContainer.appendChild(cardWrapper);
+  });
+
+  readingBoard.appendChild(layoutContainer);
+}
+
+function showReadingInterpretation() {
+  const config = SPREADS[activeReading.spreadId];
+  
+  let reportHtml = `
+    <div class="interpretation-header">
+      <h3 class="interpretation-title">✦ Interpretación de tu Tirada: ${config.name} ✦</h3>
+      <span class="interpretation-divider">🐾 ✦ 🐾 ✦ 🐾</span>
+    </div>
+    <div class="interpretation-list">
+  `;
+
+  activeReading.cards.forEach((item, index) => {
+    const card = item.card;
+    const posLabel = config.labels[index];
+    const isInv = item.inverted;
+    
+    const cardPreviewHtml = `
+      <div class="interpretation-card-preview">
+        <span class="interpretation-pos-badge">${posLabel.split(': ')[0]}</span>
+        <div class="tarot-card ${isInv ? 'is-inverted' : ''}" style="transform: ${isInv ? 'rotate(180deg)' : 'none'}; pointer-events: none;">
+          <div class="card-inner" style="background: ${(SUIT_CONFIG[card.suit] || SUIT_CONFIG.mayor).gradient}">
+            <div class="card-accent-line top" style="background: ${(SUIT_CONFIG[card.suit] || SUIT_CONFIG.mayor).lineColor}"></div>
+            <span class="card-number">${card.arcano === 'Mayor' ? card.number : card.suit.toUpperCase()}</span>
+            <span class="card-symbol">${card.symbol}</span>
+            <span class="card-name">${card.name}</span>
+            <span class="card-suit-badge">${card.arcano === 'Mayor' ? 'ARCANO MAYOR' : card.number}</span>
+            <div class="card-accent-line bot" style="background: ${(SUIT_CONFIG[card.suit] || SUIT_CONFIG.mayor).lineColor}"></div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const nameText = isInv ? `${card.name} <span class="inverted-indicator">(Invertida)</span>` : card.name;
+    const meaningText = isInv ? card.invertida : card.description;
+
+    const keywordsList = card.keywords.map(k => `<span class="keyword-pill">${k}</span>`).join('');
+
+    reportHtml += `
+      <div class="interpretation-item">
+        ${cardPreviewHtml}
+        <div class="interpretation-text">
+          <h4 class="interpretation-card-name ${isInv ? 'is-inverted-text' : ''}">${posLabel.includes(': ') ? posLabel.split(': ')[1] : posLabel}: ${nameText}</h4>
+          <p class="interpretation-desc ${isInv ? 'is-inverted-meaning' : ''}">${meaningText}</p>
+          <div class="interpretation-keywords">
+            ${keywordsList}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  reportHtml += `</div>`;
+  
+  readingInterpretation.innerHTML = reportHtml;
+  readingInterpretation.style.display = 'block';
+  
+  readingInterpretation.scrollIntoView({ behavior: 'smooth' });
+}
+
+$('btnSpread1').addEventListener('click', () => initReading(1));
+$('btnSpread3').addEventListener('click', () => initReading(3));
+$('btnSpread5').addEventListener('click', () => initReading(5));
 
 // ─── Init ────────────────────────────────────────────
 
